@@ -4,10 +4,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.cache.Cache.Entry;
+
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class LRULinkedListNode<K, V> {
+public class LRULinkedListNode<K, V> implements Entry<K, V> {
     @EqualsAndHashCode.Include
     private K key;
     @EqualsAndHashCode.Include
@@ -28,5 +30,10 @@ public class LRULinkedListNode<K, V> {
     public String toString() {
         return "LinkedListNode{" + "key=" + key + ", " + "prevKey=" + getKeyString(prev) + ", " + "nextKey="
                 + getKeyString(next) + '}';
+    }
+
+    @Override
+    public Object unwrap(Class clazz) {
+        return null;
     }
 }

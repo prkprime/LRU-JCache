@@ -38,11 +38,14 @@ public class LRULinkedList<K, V> implements Serializable {
     }
 
     /**
-     * remove last element from the linked list
+     * evict last element from the linked list
+     *
+     * @return key of the evicted node
      */
-    public void evictLast() {
+    public K evictLast() {
         if (last != null) { // if last is null, that means list is empty. nothing to evict, return
             LRULinkedListNode<K, V> f = last.getPrev(); // get 2nd last element
+            K key = last.getKey(); // get key of node to be evicted
             last.setKey(null); // set key of last to null
             last.setValue(null); // set value of last to null
             last.setPrev(null); // set prev value of last to null
@@ -53,7 +56,9 @@ public class LRULinkedList<K, V> implements Serializable {
                 f.setNext(null); // set next link of prev to null
             }
             --size;
+            return key;
         }
+        return null;
     }
 
     /**
@@ -68,15 +73,24 @@ public class LRULinkedList<K, V> implements Serializable {
         if (prev == null) { // if prev node is null, i.e. current node is head, no need for promotion
             return;
         } else { // if prev is non-null
-            prev.setNext(next); // set next to prev->next
-            if (next != null) { // if next is non-null i.e not last element
-                next.setPrev(prev); // set prev next->prev
-            }
-            node.setPrev(null); // remove all linking of node to be promoted
-            node.setNext(null);
-            --size; // since add first is going to increase size, we decrease here when we remove node
+            LRULinkedListNode<K, V> ignored = deleteNode(node);
         }
         addFirst(node); // promote t first
+    }
+
+    public LRULinkedListNode<K, V> deleteNode(LRULinkedListNode<K, V> node) {
+        LRULinkedListNode<K, V> prev = node.getPrev(); // get prev node
+        LRULinkedListNode<K, V> next = node.getNext(); // get next node
+        if (prev != null) { // if prev is non-null i.e. not first node
+            prev.setNext(next); // set next to prev->next
+        }
+        if (next != null) { // if next is non-null i.e not last node
+            next.setPrev(prev); // set prev next->prev
+        }
+        node.setPrev(null); // remove all linking of node to be promoted
+        node.setNext(null);
+        --size; // since add first is going to increase size, we decrease here when we remove node
+        return node;
     }
 
     /**
@@ -126,6 +140,18 @@ public class LRULinkedList<K, V> implements Serializable {
             node = node.getNext();
         }
         return node;
+    }
+
+    public void clear() {
+        getAll().forEach(node -> {
+            node.setPrev(null);
+            node.setNext(null);
+            node.setKey(null);
+            node.setValue(null);
+        });
+        first = null;
+        last = null;
+        size = 0;
     }
 
     @Override

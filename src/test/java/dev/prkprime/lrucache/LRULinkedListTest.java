@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LinkedListInternalTest {
+public class LRULinkedListTest {
 
     @Test
     public void newListTest() {
@@ -50,7 +50,7 @@ public class LinkedListInternalTest {
         nodes.forEach(linkedList::addFirst);
         nodes = nodes.reversed();
         for (int i = 0; i < size; i++) {
-            linkedList.evictLast();
+            String ignored = linkedList.evictLast();
             nodes.removeLast();
             checkAllEqual(nodes.size(), linkedList, nodes);
         }
@@ -63,9 +63,7 @@ public class LinkedListInternalTest {
         List<LRULinkedListNode<String, String>> nodes = getNodes(size);
         nodes.forEach(linkedList::addFirst);
         nodes = nodes.reversed();
-        System.out.println(linkedList);
         linkedList.promoteToFirst(linkedList.getByIndex(3));
-        System.out.println(linkedList);
         assert linkedList.getByIndex(0).equals(nodes.get(3));
         assert linkedList.getByIndex(1).equals(nodes.get(0));
         assert linkedList.getByIndex(2).equals(nodes.get(1));
